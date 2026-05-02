@@ -21,3 +21,26 @@ variable "avatars_bucket_name" {
   type        = string
 }
 
+variable "dynamodb_table_name" {
+  description = "Name of the DynamoDB table that stores users."
+  type        = string
+  default     = "prima-tech-challenge-users"
+}
+
+variable "dynamodb_hash_key" {
+  description = "Primary key attribute of the users table. The app uses `email`."
+  type        = string
+  default     = "email"
+}
+
+variable "dynamodb_deletion_protection" {
+  description = "Enable deletion protection on the DynamoDB table."
+  type        = bool
+  default     = true
+}
+
+variable "ecr_repository_name" {
+  description = "Name of the ECR repository."
+  type        = string
+  default     = "prima-tech-challenge-api"
+}

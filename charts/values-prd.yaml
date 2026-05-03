@@ -21,3 +21,10 @@ resources:
 env:
   DYNAMODB_TABLE: prima-tech-challenge-users
   S3_BUCKET: prima-tech-challenge-avatars
+
+serviceAccount:
+  create: true
+  automount: true
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::803871048799:role/prima-tech-challenge-api
+  name: "prima-tech-challenge-api"

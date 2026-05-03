@@ -15,5 +15,10 @@ app = Flask(__name__)
 app.register_blueprint(user_blueprint, url_prefix="/")
 app.register_blueprint(swagger_ui_blueprint, url_prefix=SWAGGER_URL)
 
+@app.route("/healthz")
+def health():
+    return {"status": "ok"}, 200
+
+
 if __name__ == "__main__":
     app.run(debug=True)

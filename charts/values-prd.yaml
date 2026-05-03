@@ -1,0 +1,23 @@
+image:
+  pullPolicy: Always
+  tag: ""
+
+replicaCount: 2
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+env:
+  DYNAMODB_TABLE: prima-tech-challenge-users
+  S3_BUCKET: prima-tech-challenge-avatars

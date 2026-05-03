@@ -8,12 +8,7 @@ from .utils import check_env_vars
 required_env_vars = [
     "DYNAMODB_TABLE",
     "S3_BUCKET",
-    "AWS_ACCESS_KEY_ID",
-    "AWS_SECRET_ACCESS_KEY",
 ]
-if os.getenv("LOCALSTACK_HOST"):
-    required_env_vars.remove("AWS_ACCESS_KEY_ID")
-    required_env_vars.remove("AWS_SECRET_ACCESS_KEY")
 
 if not check_env_vars(*required_env_vars):
     raise EnvironmentError("Required environment variables are not set")
@@ -22,12 +17,6 @@ DYNAMODB_TABLE = os.getenv("DYNAMODB_TABLE")
 S3_BUCKET = os.getenv("S3_BUCKET")
 LOCALSTACK_HOST = os.getenv("LOCALSTACK_HOST")
 AWS_REGION = os.getenv("AWS_REGION", "eu-west-1")
-AWS_ACCESS_KEY_ID = os.getenv(
-    "AWS_ACCESS_KEY_ID", "fakeAccessKeyId" if LOCALSTACK_HOST else None
-)
-AWS_SECRET_ACCESS_KEY = os.getenv(
-    "AWS_SECRET_ACCESS_KEY", "fakeSecretAccessKey" if LOCALSTACK_HOST else None
-)
 
 
 def get_all_users():
@@ -46,8 +35,6 @@ def get_all_users():
         "dynamodb",
         region_name=AWS_REGION,
         endpoint_url=LOCALSTACK_HOST,
-        aws_access_key_id=AWS_ACCESS_KEY_ID,
-        aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
     )
 
     table = dynamodb.Table(DYNAMODB_TABLE)
@@ -78,8 +65,6 @@ def create_user(user_data):
         "dynamodb",
         region_name=AWS_REGION,
         endpoint_url=LOCALSTACK_HOST,
-        aws_access_key_id=AWS_ACCESS_KEY_ID,
-        aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
     )
 
     table = dynamodb.Table(DYNAMODB_TABLE)
@@ -110,8 +95,6 @@ def uploader(file, filename):
         "s3",
         region_name=AWS_REGION,
         endpoint_url=LOCALSTACK_HOST,
-        aws_access_key_id=AWS_ACCESS_KEY_ID,
-        aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
     )
 
     try:

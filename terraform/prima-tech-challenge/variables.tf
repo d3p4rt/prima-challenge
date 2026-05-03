@@ -44,3 +44,14 @@ variable "ecr_repository_name" {
   type        = string
   default     = "prima-tech-challenge-api"
 }
+variable "k8s_namespace" {
+  description = "NS where app is deployed."
+  type        = string
+  default     = "default"
+}
+
+variable "k8s_service_account" {
+  description = "Kubernetes ServiceAccount name used by the app."
+  type        = string
+  default     = "prima-tech-challenge-api"
+}

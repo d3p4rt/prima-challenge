@@ -23,7 +23,7 @@ resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
 resource "aws_eks_cluster" "eks_cluster" {
   name     = var.project
   role_arn = aws_iam_role.eks_cluster.arn
-  version  = "1.31"
+  version  = "1.35"
 
   vpc_config {
     subnet_ids = aws_subnet.public[*].id
@@ -83,4 +83,10 @@ resource "aws_iam_openid_connect_provider" "eks" {
   client_id_list = ["sts.amazonaws.com"]
 
   depends_on = [aws_eks_cluster.eks_cluster]
+}
+
+resource "aws_eks_access_entry" "nodes" {
+  cluster_name  = aws_eks_cluster.eks_cluster.name
+  principal_arn = aws_iam_role.eks_nodes.arn
+  type          = "EC2_LINUX"
 }

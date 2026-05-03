@@ -29,6 +29,10 @@ resource "aws_eks_cluster" "eks_cluster" {
     subnet_ids = aws_subnet.public[*].id
   }
 
+  access_config {
+    authentication_mode = "API_AND_CONFIG_MAP"
+  }
+
   depends_on = [aws_iam_role_policy_attachment.eks_cluster_policy]
 }
 
@@ -89,4 +93,22 @@ resource "aws_eks_access_entry" "nodes" {
   cluster_name  = aws_eks_cluster.eks_cluster.name
   principal_arn = aws_iam_role.eks_nodes.arn
   type          = "EC2_LINUX"
+}
+
+resource "aws_eks_access_entry" "terraform_user" {
+  cluster_name  = aws_eks_cluster.eks_cluster.name
+  principal_arn = "arn:aws:iam::803871048799:user/prima-tech-challenge-terraform"
+  type          = "STANDARD"
+}
+
+resource "aws_eks_access_policy_association" "terraform_user" {
+  cluster_name  = aws_eks_cluster.eks_cluster.name
+  principal_arn = "arn:aws:iam::803871048799:user/prima-tech-challenge-terraform"
+  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+
+  access_scope {
+    type = "cluster"
+  }
+
+  depends_on = [aws_eks_access_entry.terraform_user]
 }

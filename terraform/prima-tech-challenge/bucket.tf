@@ -56,3 +56,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "avatars" {
     }
   }
 }
+
+resource "aws_s3_bucket_ownership_controls" "avatars" {
+  bucket = aws_s3_bucket.avatars.id
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
+}

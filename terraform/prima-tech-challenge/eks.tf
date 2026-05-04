@@ -144,9 +144,9 @@ resource "aws_eks_access_policy_association" "terraform_user" {
 }
 
 resource "aws_eks_access_entry" "github_actions_role" {
-  cluster_name      = aws_eks_cluster.eks_cluster.name
-  principal_arn     = "arn:aws:iam::803871048799:role/prima-tech-challenge-github-actions"
-  type              = "STANDARD"
+  cluster_name  = aws_eks_cluster.eks_cluster.name
+  principal_arn = "arn:aws:iam::803871048799:role/prima-tech-challenge-github-actions"
+  type          = "STANDARD"
 }
 
 resource "aws_eks_access_policy_association" "github_actions_role_admin" {

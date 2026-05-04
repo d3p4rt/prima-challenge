@@ -109,26 +109,6 @@ resource "aws_security_group_rule" "nodes_ingress_cluster_9443" {
   source_security_group_id = aws_security_group.eks_cluster.id
 }
 
-resource "aws_security_group_rule" "nodes_ingress_http" {
-  description       = "Allow HTTP from anywhere"
-  type              = "ingress"
-  from_port         = 80
-  to_port           = 80
-  protocol          = "tcp"
-  security_group_id = aws_security_group.eks_nodes.id
-  cidr_blocks       = ["0.0.0.0/0"]
-}
-
-resource "aws_security_group_rule" "nodes_ingress_https" {
-  description       = "Allow HTTPS from anywhere"
-  type              = "ingress"
-  from_port         = 443
-  to_port           = 443
-  protocol          = "tcp"
-  security_group_id = aws_security_group.eks_nodes.id
-  cidr_blocks       = ["0.0.0.0/0"]
-}
-
 resource "aws_security_group" "alb" {
   name        = "${var.project}-alb-sg"
   description = "Security group for ALB managed by EKS Ingress"

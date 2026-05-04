@@ -44,7 +44,7 @@ jobs:
 
       - name: Helm Upgrade
         run: |
-          helm upgrade --install prd-release ./charts/api \
+          helm upgrade --install prima-api ./charts/api \
             -f ./charts/values-prd.yaml \
             --set image.tag=${{ steps.tag.outputs.tag }} \
             --namespace production \

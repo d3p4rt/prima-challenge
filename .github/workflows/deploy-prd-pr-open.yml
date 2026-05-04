@@ -45,12 +45,12 @@ jobs:
         run: aws eks update-kubeconfig --name prima-tech-challenge --region eu-south-1
 
       - name: Install helm-diff plugin
-        run: helm plugin install https://github.com/databus23/helm-diff --verify=false
+        run: helm plugin install https://github.com/databus23/helm-diff 
 
       - name: Helm Diff
         id: diff
         run: |
-          helm diff upgrade --install prd-release ./charts/api \
+          helm diff upgrade --install prima-api ./charts/api \
             -f ./charts/values-prd.yaml \
             --set image.tag=${{ steps.tag.outputs.tag }} \
             --namespace production \

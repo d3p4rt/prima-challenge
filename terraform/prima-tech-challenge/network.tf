@@ -179,3 +179,13 @@ resource "aws_security_group_rule" "cluster_ingress_all_from_nodes" {
   security_group_id        = aws_security_group.eks_cluster.id
   source_security_group_id = aws_security_group.eks_nodes.id
 }
+
+resource "aws_security_group_rule" "cluster_ingress_https_public" {
+  description       = "Allow HTTPS access to EKS API server from anywhere"
+  type              = "ingress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.eks_cluster.id
+}

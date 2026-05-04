@@ -1,0 +1,88 @@
+name: Terraform Destroy
+
+on:
+  workflow_dispatch:
+    inputs:
+      stack:
+        description: 'Stack to destroy'
+        required: true
+        type: choice
+        options:
+          - bootstrap
+          - prima-tech-challenge
+          - all
+      confirm:
+        description: 'Type DESTROY to confirm'
+        required: true
+        type: string
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check confirmation
+        if: inputs.confirm != 'DESTROY'
+        run: |
+          echo "Confirmation failed. You must type DESTROY to proceed."
+          exit 1
+
+  destroy-infra:
+    needs: validate
+    if: inputs.stack == 'prima-tech-challenge' || inputs.stack == 'all'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform/prima-tech-challenge
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: eu-south-1
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init -backend-config="bucket=${{ vars.TF_STATE_BUCKET }}"
+
+      - name: Terraform Destroy
+        run: terraform destroy -auto-approve
+        env:
+          TF_VAR_avatars_bucket_name: ${{ vars.AVATARS_BUCKET_NAME }}
+
+  destroy-bootstrap:
+    needs: [validate, destroy-infra]
+    if: |
+      always() &&
+      inputs.stack == 'bootstrap' || inputs.stack == 'all' &&
+      (needs.destroy-infra.result == 'success' || needs.destroy-infra.result == 'skipped')
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform/bootstrap
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: eu-south-1
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init -backend-config="bucket=${{ vars.TF_STATE_BUCKET }}"
+
+      - name: Terraform Destroy
+        run: terraform destroy -auto-approve
+        env:
+          TF_VAR_tf_state_bucket_name: ${{ vars.TF_STATE_BUCKET }}

@@ -20,7 +20,8 @@ resources:
 
 env:
   DYNAMODB_TABLE: prima-tech-challenge-users
-  S3_BUCKET: prima-tech-challenge-avatars
+  S3_BUCKET: prima-tech-challenge-40-avatars
+
 
 serviceAccount:
   create: true

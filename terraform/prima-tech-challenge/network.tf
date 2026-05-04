@@ -153,12 +153,12 @@ resource "aws_security_group" "alb" {
 }
 
 resource "aws_security_group_rule" "nodes_ingress_app" {
-  description       = "Allow ALB to reach the app"
-  type              = "ingress"
-  from_port         = 5000
-  to_port           = 5000 
-  protocol          = "tcp"
-  security_group_id = aws_security_group.eks_nodes.id
+  description              = "Allow ALB to reach the app"
+  type                     = "ingress"
+  from_port                = 5000
+  to_port                  = 5000
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.eks_nodes.id
   source_security_group_id = aws_security_group.alb.id
 }
 

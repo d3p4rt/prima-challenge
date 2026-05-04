@@ -45,7 +45,7 @@ jobs:
         run: aws eks update-kubeconfig --name prima-tech-challenge --region eu-south-1
 
       - name: Install helm-diff plugin
-        run: helm plugin install https://github.com/databus23/helm-diff
+        run: helm plugin install https://github.com/databus23/helm-diff --verify=false
 
       - name: Helm Diff
         id: diff

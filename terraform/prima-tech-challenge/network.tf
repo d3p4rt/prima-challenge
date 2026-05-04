@@ -156,15 +156,6 @@ resource "aws_security_group" "alb" {
   }
 }
 
-resource "aws_security_group_rule" "nodes_ingress_app" {
-  description              = "Allow ALB to reach the app"
-  type                     = "ingress"
-  from_port                = 5000
-  to_port                  = 5000
-  protocol                 = "tcp"
-  security_group_id        = aws_security_group.eks_nodes.id
-  source_security_group_id = aws_security_group.alb.id
-}
 
 resource "aws_security_group_rule" "nodes_ingress_cluster_everything" {
   description              = "Allow all traffic from cluster control plane to nodes"
@@ -202,4 +193,25 @@ resource "aws_security_group_rule" "cluster_egress_nodes_9443" {
   protocol                 = "tcp"
   security_group_id        = aws_security_group.eks_cluster.id
   source_security_group_id = aws_security_group.eks_nodes.id
+}
+
+
+resource "aws_security_group_rule" "nodes_ingress_app_5000" {
+  description              = "Allow ALB to reach Flask app on port 5000"
+  type                     = "ingress"
+  from_port                = 5000
+  to_port                  = 5000
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.eks_nodes.id
+  source_security_group_id = aws_security_group.alb.id
+}
+
+resource "aws_security_group_rule" "nodes_ingress_nodeports" {
+  description              = "Allow ALB to reach NodePorts"
+  type                     = "ingress"
+  from_port                = 30000
+  to_port                  = 32767
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.eks_nodes.id
+  source_security_group_id = aws_security_group.alb.id
 }

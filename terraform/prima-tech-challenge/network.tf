@@ -41,13 +41,6 @@ resource "aws_security_group" "eks_cluster" {
   name   = "${var.project}-eks-cluster"
   vpc_id = aws_vpc.eks-vpc.id
 
-  ingress {
-    from_port       = 443
-    to_port         = 443
-    protocol        = "tcp"
-    security_groups = [aws_security_group.eks_nodes.id]
-  }
-
   egress {
     from_port   = 0
     to_port     = 0
@@ -67,24 +60,37 @@ resource "aws_security_group" "eks_nodes" {
     self      = true
   }
 
-  ingress {
-    from_port       = 10250
-    to_port         = 10250
-    protocol        = "tcp"
-    security_groups = [aws_security_group.eks_cluster.id]
-  }
-
-  ingress {
-    from_port       = 443
-    to_port         = 443
-    protocol        = "tcp"
-    security_groups = [aws_security_group.eks_cluster.id]
-  }
-
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+}
+
+resource "aws_security_group_rule" "cluster_ingress_nodes_443" {
+  type                     = "ingress"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.eks_cluster.id
+  source_security_group_id = aws_security_group.eks_nodes.id
+}
+
+resource "aws_security_group_rule" "nodes_ingress_cluster_10250" {
+  type                     = "ingress"
+  from_port                = 10250
+  to_port                  = 10250
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.eks_nodes.id
+  source_security_group_id = aws_security_group.eks_cluster.id
+}
+
+resource "aws_security_group_rule" "nodes_ingress_cluster_443" {
+  type                     = "ingress"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.eks_nodes.id
+  source_security_group_id = aws_security_group.eks_cluster.id
 }

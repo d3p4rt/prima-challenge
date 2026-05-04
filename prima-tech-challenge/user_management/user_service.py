@@ -98,9 +98,8 @@ def uploader(file, filename):
     )
 
     try:
-        s3_client.upload_fileobj(
-            file, S3_BUCKET, filename, ExtraArgs={"ACL": "public-read"}
-        )
+        s3_client.upload_fileobj(file, S3_BUCKET, filename)
         return f"https://{S3_BUCKET}.s3.{AWS_REGION}.amazonaws.com/{filename}"
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        print(f"ERROR: S3 upload failed: {str(e)}")
+        return None

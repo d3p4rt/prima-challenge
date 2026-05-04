@@ -15,7 +15,11 @@ resource "aws_subnet" "public" {
   availability_zone = data.aws_availability_zones.available.names[count.index]
 
   map_public_ip_on_launch = true
-
+  tags = {
+    Name                                   = "public-subnet-${count.index}"
+    "kubernetes.io/role/elb"               = "1"
+    "kubernetes.io/cluster/${var.project}" = "shared"
+  }
 }
 
 resource "aws_internet_gateway" "eks-vpc" {
@@ -188,4 +192,14 @@ resource "aws_security_group_rule" "cluster_ingress_https_public" {
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.eks_cluster.id
+}
+
+resource "aws_security_group_rule" "cluster_egress_nodes_9443" {
+  description              = "Allow Cluster Control Plane to send webhook requests to nodes"
+  type                     = "egress"
+  from_port                = 9443
+  to_port                  = 9443
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.eks_cluster.id
+  source_security_group_id = aws_security_group.eks_nodes.id
 }

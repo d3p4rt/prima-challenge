@@ -10,13 +10,16 @@ required_env_vars = [
     "S3_BUCKET",
 ]
 
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 if not check_env_vars(*required_env_vars):
     raise EnvironmentError("Required environment variables are not set")
 
 DYNAMODB_TABLE = os.getenv("DYNAMODB_TABLE")
 S3_BUCKET = os.getenv("S3_BUCKET")
 LOCALSTACK_HOST = os.getenv("LOCALSTACK_HOST")
-AWS_REGION = os.getenv("AWS_REGION", "eu-west-1")
+AWS_REGION = os.getenv("AWS_REGION", "eu-south-1")
 
 
 def get_all_users():
@@ -91,15 +94,27 @@ def uploader(file, filename):
         Tuple[Response, int]: JSON response indicating success or failure and HTTP status code.
     """
 
+    bucket_name = os.getenv("S3_BUCKET")
+    region = os.getenv("AWS_REGION", "eu-south-1")
+
+    localstack_url = os.getenv("LOCALSTACK_HOST")
+    endpoint_url = localstack_url if localstack_url else None
+
     s3_client = boto3.client(
         "s3",
-        region_name=AWS_REGION,
-        endpoint_url=LOCALSTACK_HOST,
+        region_name=region,
+        endpoint_url=endpoint_url,
     )
 
     try:
-        s3_client.upload_fileobj(file, S3_BUCKET, filename)
-        return f"https://{S3_BUCKET}.s3.{AWS_REGION}.amazonaws.com/{filename}"
+        file.seek(0)
+        
+        s3_client.upload_fileobj(file, bucket_name, filename)
+        
+        url = f"https://{bucket_name}.s3.{region}.amazonaws.com/{filename}"
+        logger.info(f"SUCCESS: File {filename} uploaded to {bucket_name}")
+        return url
+
     except Exception as e:
-        print(f"ERROR: S3 upload failed: {str(e)}")
+        logger.error(f"CRITICAL: S3 upload failed for {filename}: {str(e)}")
         return None

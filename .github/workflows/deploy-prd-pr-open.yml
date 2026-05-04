@@ -1,0 +1,58 @@
+name: Helm Diff PRD
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+jobs:
+  helm-diff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get latest tag
+        id: tag
+        run: |
+          TAG=$(git tag --sort=-version:refname | grep '^v' | head -1)
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: eu-south-1
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+
+
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --name prima-tech-challenge --region eu-south-1
+
+      - name: Install helm-diff plugin
+        run: helm plugin install https://github.com/databus23/helm-diff --verify=false
+
+      - name: Helm Diff
+        id: diff
+        run: |
+          helm diff upgrade --install prima-api ./charts/api \
+            -f ./charts/values-prd.yaml \
+            --set image.tag=${{ steps.tag.outputs.tag }} \
+            --namespace production \
+            --no-color 2>&1 | tee diff-output.txt
+

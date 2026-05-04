@@ -29,5 +29,11 @@ serviceAccount:
     eks.amazonaws.com/role-arn: arn:aws:iam::803871048799:role/prima-tech-challenge-api
   name: "prima-tech-challenge-api"
 
-gateway:
+ingress:
   enabled: true
+  className: alb
+  path: /
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/security-groups: sg-0ade28d062841c743

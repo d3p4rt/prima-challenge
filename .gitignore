@@ -137,3 +137,5 @@ pulumi/
 .terraform.lock.hcl
 *.tfstate
 *.tfstate.*
+
+.DS_Store

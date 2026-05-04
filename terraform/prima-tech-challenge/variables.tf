@@ -47,7 +47,7 @@ variable "ecr_repository_name" {
 variable "k8s_namespace" {
   description = "NS where app is deployed."
   type        = string
-  default     = "default"
+  default     = "production"
 }
 
 variable "k8s_service_account" {

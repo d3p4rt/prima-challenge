@@ -27,6 +27,7 @@ resource "aws_eks_cluster" "eks_cluster" {
 
   vpc_config {
     subnet_ids = aws_subnet.public[*].id
+    security_group_ids = [aws_security_group.eks_cluster.id]
   }
 
   access_config {
@@ -63,12 +64,20 @@ resource "aws_iam_role_policy_attachment" "eks_cni_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
 }
 
+resource "aws_iam_role_policy_attachment" "eks_ssm_policy" {
+  role       = aws_iam_role.eks_nodes.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
 resource "aws_eks_node_group" "eks_cluster" {
   cluster_name    = aws_eks_cluster.eks_cluster.name
   node_group_name = "${var.project}-nodes"
   node_role_arn   = aws_iam_role.eks_nodes.arn
   subnet_ids      = aws_subnet.public[*].id
-  instance_types  = ["t3.small"]
+  launch_template {
+    name    = aws_launch_template.eks_nodes.name
+    version = aws_launch_template.eks_nodes.latest_version
+  }
 
   scaling_config {
     desired_size = 1
@@ -79,8 +88,20 @@ resource "aws_eks_node_group" "eks_cluster" {
   depends_on = [
     aws_iam_role_policy_attachment.eks_worker_node_policy,
     aws_iam_role_policy_attachment.eks_cni_policy,
+    aws_iam_role_policy_attachment.eks_ssm_policy,
   ]
 }
+
+resource "aws_launch_template" "eks_nodes" {
+  name          = "${var.project}-eks-nodes"
+  instance_type = "t3.small"
+
+  network_interfaces {
+    associate_public_ip_address = true
+    security_groups             = [aws_security_group.eks_nodes.id]
+  }
+}
+
 
 resource "aws_iam_openid_connect_provider" "eks" {
   url            = aws_eks_cluster.eks_cluster.identity[0].oidc[0].issuer

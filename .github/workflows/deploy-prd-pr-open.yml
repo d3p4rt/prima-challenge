@@ -44,6 +44,12 @@ jobs:
       - name: Update kubeconfig
         run: aws eks update-kubeconfig --name prima-tech-challenge --region eu-south-1
 
+      - name: Debug
+        run: |
+          aws sts get-caller-identity
+          aws eks update-kubeconfig --name prima-tech-challenge --region eu-south-1
+          kubectl auth can-i get nodes
+
       - name: Install helm-diff plugin
         run: helm plugin install https://github.com/databus23/helm-diff --verify=false
 

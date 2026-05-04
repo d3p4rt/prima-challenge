@@ -123,3 +123,10 @@ env:
   AWS_REGION: eu-south-1
   DYNAMODB_TABLE: tablename
   S3_BUCKET: bucketname
+
+gateway:
+  enabled: false
+  className: "alb"
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip

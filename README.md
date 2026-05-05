@@ -44,6 +44,10 @@ When the PR is opened, a job runs `helm diff` to show exactly what will change (
 ## Infrastructure Cleanup
 Once the review is complete, all AWS infrastructure was destroyed using a manual GitHub Actions pipeline (`terraform-destroy.yml`) that supports selective or full teardown, requiring an explicit `DESTROY` confirmation to prevent accidental runs.
 
+
+## Final Thoughts
+I tested the full flow end to end and the API server behaves as expected.
+
 ```
 ~ $ curl -i -X POST http://k8s-producti-primaapi-68f93b86fb-1173729742.eu-south-1.elb.amazonaws.com/user \
 >      -F "name=d3p4rt" \
@@ -74,9 +78,6 @@ Server: Werkzeug/3.0.3 Python/3.11.15
 [{"avatar_url":"https://prima-tech-challenge-40-avatars.s3.eu-south-1.amazonaws.com/avatar.png","email":"d3p4rt@protonmail.com","name":"d3p4rt"}]
 
 ```
-
-## Final Thoughts
-I tested the full flow end to end and the API server behaves as expected.
 
 I've kept this description brief to avoid going into too much detail — if you decide to move forward I'd be happy to answer any questions about the challenge during the interview!
 
